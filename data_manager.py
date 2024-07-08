@@ -21,7 +21,12 @@ class DataManager:
         
         response = requests.get(url=self.sheety_url, headers=headers)
         response.raise_for_status()
-        return response.json()
+        data = response.json()['prices']
+
+        for index in range(len(data)):
+            data[index]['lowestPrice'] = float(data[index]['lowestPrice'])
+        
+        return data
     
     def update_flight_data(self, row_number:int, city:str, iata_code:str, lowest_price:float) -> None:
         # headers

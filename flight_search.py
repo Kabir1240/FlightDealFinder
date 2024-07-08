@@ -80,7 +80,7 @@ class FlightSearch:
                 {
                     'origin':self.origin_code,
                     'destination':destination_code,
-                    'price':f"{flight['price']['total']} {self.currency_code}",
+                    'price':float(flight['price']['total']),
                     'date':date
                 }
             flight_list.append(new_dictionary)

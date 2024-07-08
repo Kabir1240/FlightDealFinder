@@ -1,3 +1,4 @@
+import json
 from flight_search import FlightSearch
 from data_manager import DataManager
 from datetime import datetime, timedelta
@@ -15,8 +16,25 @@ def update_iata_codes():
         DATA_MANAGER.update_iata_code(row_number=city['id'], iata_code=iata_code)
 
 
-def get_cheap_flights(months:int=6):
+def get_cheap_flights(months:int=6) -> list:
+    with open('flight_dummy_data.json','r') as file:
+        city_data = json.load(file)['prices']
+    
+    # city_data = DATA_MANAGER.get_flight_data()
+
     days = months*31
+    cheap_flights = []
     for n_days in range(days):
         date = (datetime.now() + timedelta(days=n_days)).strftime('%Y-%m-%d')
-        
+        for city in city_data:
+            print(f"Searching for flights to {city["city"]} on {date}")
+            flight_data = FLIGHT_SEARCH.get_flight_offers(destination_code=city["iataCode"], date=date)
+            if flight_data is not None:
+                for flight in flight_data:
+                        print(flight['price'], city['lowestPrice'])
+                        if flight['price'] < city['lowestPrice']:
+                            cheap_flights.append(flight)
+
+
+print(get_cheap_flights())
+
