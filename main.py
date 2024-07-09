@@ -1,10 +1,11 @@
+import json
 from flight_search import FlightSearch
 from data_manager import DataManager
 from notification_manager import NotificationManager
 
 
-DATA_MANAGER = DataManager()
-FLIGHT_SEARCH = FlightSearch()
+DATA_MANAGER = None
+FLIGHT_SEARCH = None
 NOTIFICATION_MANAGER = NotificationManager()
 EMAIL_PATH = "email.json"
 
@@ -23,3 +24,23 @@ def update_lowest_price():
         city['lowestPrice'] = None
     
     NOTIFICATION_MANAGER.get_cheap_flights(city_data=city_data)
+
+def main():
+    global DATA_MANAGER
+    global FLIGHT_SEARCH
+
+    with open('data.json') as file:
+        data = json.load(file)
+    
+    if data['data']['FIRST_TIME'] == 'yes':
+        DATA_MANAGER = DataManager()
+        FLIGHT_SEARCH = FlightSearch()
+
+        update_iata_codes()
+        update_lowest_price()
+
+        data['data']['FIRST_TIME'] = 'no'
+        json.dump(data, 'data.json')
+
+    NOTIFICATION_MANAGER.email_cheap_flights()
+
