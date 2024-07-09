@@ -183,8 +183,9 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 new_git.bat
-keys.json
+data.json
 flight_dummy_data.json
+email.json
 
 # idea folder, uncomment if you don't need it
 # .idea

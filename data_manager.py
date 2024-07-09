@@ -5,8 +5,8 @@ import requests
 class DataManager:
     #This class is responsible for talking to the Google Sheet.
     def __init__(self):
-        with open("keys.json", 'r') as file:
-            keys = json.load(file)
+        with open("data.json", 'r') as file:
+            keys = json.load(file)['keys']
 
         self.sheety_url = keys['SHEETY_URL']
         self.sheety_token = keys['SHEETY_TOKEN']
@@ -25,6 +25,20 @@ class DataManager:
 
         for index in range(len(data)):
             data[index]['lowestPrice'] = float(data[index]['lowestPrice'])
+        
+        return data
+    
+    def get_user_data(self):
+        # headers
+        headers = \
+            {
+                'Authorization':self.sheety_token,
+                'Content-Type':"application/json"
+            }
+        
+        response = requests.get(url=self.sheety_url, headers=headers)
+        response.raise_for_status()
+        data = response.json()['users']
         
         return data
     

@@ -6,17 +6,20 @@ class FlightSearch:
     #This class is responsible for talking to the Flight Search API.
     
     def __init__(self):
-        with open("keys.json", 'r') as file:
-            keys = json.load(file)
+        with open("data.json", 'r') as file:
+            data = json.load(file)
 
+        # load user keys
         self.amadeus_url = "https://test.api.amadeus.com/"
         self.amadeus_city_search_endpoint = "v1/reference-data/locations/cities"
         self.amadeus_auth_endpoint = "v1/security/oauth2/token"
         self.amadeus_flight_offers_endpoint = "v2/shopping/flight-offers"
-        self.amadeus_api_key = keys['AMADEUS_API_KEY']
-        self.amadeus_api_secret = keys['AMADEUS_API_SECRET']
-        self.origin_code = keys["ORIGIN_LOCATION_CODE"]
-        self.currency_code = keys["CURRENCY_CODE"]
+        self.amadeus_api_key = data['keys']['AMADEUS_API_KEY']
+        self.amadeus_api_secret = data['keys']['AMADEUS_API_SECRET']
+
+        # load user settings
+        self.origin_code = data['init_data']["ORIGIN_LOCATION_CODE"]
+        self.currency_code = data['init_data']["CURRENCY_CODE"]
     
     def get_iata_code(self, city:str) -> str:
         access_token = "Bearer " + self.get_amadeus_access_token()
