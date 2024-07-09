@@ -22,6 +22,17 @@ class FlightSearch:
         self.currency_code = data['init_data']["CURRENCY_CODE"]
     
     def get_iata_code(self, city:str) -> str:
+        """
+        get the IATA code for a certain city
+
+        Args:
+            city (str): name of city
+
+        Returns:
+            str: the IATA code
+        """
+
+        # headers
         access_token = "Bearer " + self.get_amadeus_access_token()
         headers = \
             {
@@ -29,22 +40,36 @@ class FlightSearch:
                 'Authorization':access_token,
             }
 
+        # parameters
         params = \
             {
                 'keyword':city,
                 'max':1,
             }
-        
+
+        # get response        
         response = requests.get(url=self.amadeus_url+self.amadeus_city_search_endpoint, headers=headers, params=params)
         response.raise_for_status()
+
+        # inform user
         print(f"Retrieved IATA code for {city}")
+        # return the IATA code
         return response.json()['data'][0]['iataCode']
 
     def get_amadeus_access_token(self) -> str:
+        """
+        get Amadeus Token for authorization.
+
+        Returns:
+            str: token
+        """
+
+        # headers
         headers = {
         'Content-Type': 'application/x-www-form-urlencoded'
         }
 
+        # parameters
         params = \
             {
                 'grant_type': 'client_credentials',
@@ -52,11 +77,25 @@ class FlightSearch:
                 "client_secret":self.amadeus_api_secret
             }
 
+        # get response
         response = requests.post(url=self.amadeus_url+self.amadeus_auth_endpoint, headers=headers, data=params)
         response.raise_for_status()
+        # return access token
         return response.json()['access_token']
 
-    def get_flight_offers(self, destination_code:str, date:str):
+    def get_flight_offers(self, destination_code:str, date:str) -> list:
+        """
+        get all flight offers for a certain destination
+
+        Args:
+            destination_code (str): IATA code for destination
+            date (str): date of flight
+
+        Returns:
+            list: list of flights
+        """
+
+        # headers
         access_token = "Bearer " + self.get_amadeus_access_token()
         headers = \
             {
@@ -64,6 +103,7 @@ class FlightSearch:
                 'Authorization':access_token,
             }
 
+        # params
         params = \
             {
                 'originLocationCode':self.origin_code,
@@ -74,9 +114,11 @@ class FlightSearch:
                 'max':250,
             }
         
+        # get response
         response = requests.get(self.amadeus_url+self.amadeus_flight_offers_endpoint, headers=headers, params=params)
         response.raise_for_status()
 
+        # organize return data for a more condensed and readable formm
         flight_list = []
         for flight in response.json()['data']:
             new_dictionary = \
@@ -88,6 +130,7 @@ class FlightSearch:
                 }
             flight_list.append(new_dictionary)
         
+        # if no flights are found, return None
         if len(flight_list) == 0:
             return None
         else:
